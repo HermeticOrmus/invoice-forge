@@ -1,0 +1,18 @@
+{
+  "company": {
+    "name": "Your Company",
+    "address": "123 Main St, City, Country",
+    "email": "billing@example.com",
+    "phone": "+1-555-0100",
+    "website": "https://example.com"
+  },
+  "payment": {
+    "bank_name": "Your Bank",
+    "account_holder": "Your Name",
+    "account_number": "XXXX-XXXX-XXXX",
+    "additional_methods": ["Bank Transfer", "PayPal"]
+  },
+  "invoice_prefix": "INV",
+  "currency": "USD",
+  "output_dir": "./invoices"
+}

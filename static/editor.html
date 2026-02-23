@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invoice Forge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/invoice.css">
+  <link rel="stylesheet" href="/static/editor.css">
+</head>
+<body>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <select id="invoiceSelect" title="Select invoice"></select>
+      <button id="btnNew" title="New invoice">+ New</button>
+      <button id="btnRefresh" title="Refresh list">Refresh</button>
+    </div>
+    <div class="toolbar-center">
+      <span id="syncStatus" class="sync-status">Ready</span>
+    </div>
+    <div class="toolbar-right">
+      <div class="sections-dropdown">
+        <button id="btnSections" title="Show/hide sections">Sections</button>
+        <div class="sections-menu hidden" id="sectionsMenu">
+          <label><input type="checkbox" data-section="discounts" checked> Discounts</label>
+          <label><input type="checkbox" data-section="payment" checked> Payment</label>
+          <label><input type="checkbox" data-section="notes" checked> Notes</label>
+          <label><input type="checkbox" data-section="footer" checked> Footer</label>
+        </div>
+      </div>
+      <button id="btnPdf" title="Export PDF">PDF</button>
+      <button id="btnOpenFolder" title="Open PDF folder" class="hidden">Open Folder</button>
+      <button id="btnTheme" title="Toggle theme">Theme</button>
+    </div>
+  </div>
+
+  <!-- New Invoice Modal -->
+  <div id="newInvoiceModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>New Invoice</h3>
+      <div class="form-group">
+        <label>Client</label>
+        <select id="newInvClient"></select>
+      </div>
+      <div class="form-group">
+        <label>Client Code</label>
+        <input type="text" id="newInvCode" value="INV" placeholder="INV, ACME, etc.">
+      </div>
+      <div class="modal-actions">
+        <button id="btnCreateInv" class="btn-primary">Create</button>
+        <button id="btnCancelNew" class="btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Invoice Editor -->
+  <div class="editor-area" id="editorArea">
+    <div class="invoice-document" id="invoiceDoc">
+
+      <!-- Header -->
+      <div class="inv-header">
+        <div class="inv-company">
+          <div class="inv-company-name" contenteditable="true" id="companyName" data-placeholder="Company name">Your Company</div>
+          <div class="inv-company-details" contenteditable="true" id="companyDetails" data-placeholder="Address, phone, email, website"></div>
+        </div>
+        <div class="inv-meta">
+          <div class="inv-title" contenteditable="true" id="invTitle" data-placeholder="INVOICE">INVOICE</div>
+          <div class="inv-number">
+            #<span contenteditable="true" id="invNumber" data-placeholder="Invoice number"></span>
+          </div>
+          <table class="inv-meta-table">
+            <tr>
+              <td>Date:</td>
+              <td><input type="date" id="invDate" class="meta-input"></td>
+            </tr>
+            <tr>
+              <td>Due:</td>
+              <td><input type="date" id="invDueDate" class="meta-input"></td>
+            </tr>
+            <tr>
+              <td>Status:</td>
+              <td>
+                <select id="invStatus" class="meta-input">
+                  <option value="draft">Draft</option>
+                  <option value="sent">Sent</option>
+                  <option value="paid">Paid</option>
+                  <option value="overdue">Overdue</option>
+                </select>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Client -->
+      <div class="inv-client-section">
+        <div class="inv-client-label">
+          Bill to:
+          <select id="clientSelect" class="client-select" title="Select client"></select>
+          <button id="btnSaveClient" class="btn-small" title="Save client to database">Save Client</button>
+        </div>
+        <div class="inv-client-name" contenteditable="true" id="clientName" data-placeholder="Client name"></div>
+        <div class="inv-client-addr" contenteditable="true" id="clientAddr" data-placeholder="Address"></div>
+        <div class="inv-client-ruc-row">
+          <span class="inv-client-ruc-label">Tax ID:</span>
+          <span contenteditable="true" id="clientRuc" class="inv-client-ruc" data-placeholder="Tax ID"></span>
+        </div>
+        <div class="inv-client-email-row">
+          <span contenteditable="true" id="clientEmail" class="inv-client-email" data-placeholder="Email"></span>
+        </div>
+      </div>
+
+      <!-- Items Table -->
+      <table class="inv-items-table" id="itemsTable">
+        <thead>
+          <tr>
+            <th class="col-desc">Description</th>
+            <th class="col-qty">Qty</th>
+            <th class="col-price">Unit Price</th>
+            <th class="col-tax">Tax</th>
+            <th class="col-amount">Amount</th>
+            <th class="col-actions"></th>
+          </tr>
+        </thead>
+        <tbody id="itemsBody"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="6">
+              <button id="btnAddItem" class="btn-add-row">+ Add item</button>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <!-- Discounts (toggleable) -->
+      <div class="inv-section" id="section-discounts" data-section="discounts">
+        <button class="btn-section-remove" data-hide="discounts" title="Hide section">&times;</button>
+        <div class="section-label">Discounts</div>
+        <div id="discountsList"></div>
+        <button id="btnAddDiscount" class="btn-add-row">+ Add discount</button>
+      </div>
+
+      <!-- Totals -->
+      <div class="inv-totals" id="totalsArea">
+        <div class="inv-totals-row">
+          <span>Subtotal:</span>
+          <span id="subtotalDisplay">$0.00</span>
+        </div>
+        <div class="inv-totals-row inv-discount" id="discountTotalRow" style="display:none;">
+          <span>Discount:</span>
+          <span id="discountTotalDisplay">-$0.00</span>
+        </div>
+        <div class="inv-totals-row">
+          <span contenteditable="true" id="taxLabel" data-placeholder="Tax">Tax:</span>
+          <span id="taxDisplay">$0.00</span>
+        </div>
+        <div class="inv-totals-row inv-total-final">
+          <span>Total:</span>
+          <span id="totalDisplay">$0.00</span>
+        </div>
+      </div>
+
+      <!-- Payment (toggleable) -->
+      <div class="inv-section inv-payment" id="section-payment" data-section="payment">
+        <button class="btn-section-remove" data-hide="payment" title="Hide section">&times;</button>
+        <div class="inv-payment-title" contenteditable="true" id="paymentTitle" data-placeholder="Payment Information">Payment Information</div>
+        <div class="inv-payment-terms" contenteditable="true" id="paymentTerms" data-placeholder="Terms: Net 30"></div>
+        <div class="inv-payment-methods" contenteditable="true" id="paymentMethods" data-placeholder="Method: Bank Transfer / PayPal / etc."></div>
+        <div class="inv-payment-bank" contenteditable="true" id="bankDetails" data-placeholder="Bank: ..."></div>
+        <div class="inv-payment-extra" contenteditable="true" id="extraDetails" data-placeholder="Additional payment info..."></div>
+      </div>
+
+      <!-- Notes (toggleable) -->
+      <div class="inv-section inv-notes" id="section-notes" data-section="notes">
+        <button class="btn-section-remove" data-hide="notes" title="Hide section">&times;</button>
+        <div class="inv-notes-title" contenteditable="true" id="notesTitle" data-placeholder="Notes">Notes</div>
+        <div class="inv-notes-text" contenteditable="true" id="notesText" data-placeholder="Add notes..."></div>
+      </div>
+
+      <!-- Footer (toggleable) -->
+      <div class="inv-section inv-footer" id="section-footer" data-section="footer">
+        <button class="btn-section-remove" data-hide="footer" title="Hide section">&times;</button>
+        <p contenteditable="true" id="footerLine1" data-placeholder="Thank you for your business.">Thank you for your business.</p>
+        <p class="inv-footer-motto" contenteditable="true" id="footerLine2" data-placeholder="Tagline..."></p>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="/static/editor.js"></script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+invoices/
+config.json
+.env
+output/
+documents/
+static/logo.png

@@ -1,0 +1,14 @@
+{
+  "clients": [
+    {
+      "id": "acme-corp",
+      "code": "ACME",
+      "name": "Acme Corp",
+      "address": "456 Business Ave, Suite 200\nNew York, NY 10001",
+      "ruc": "",
+      "email": "jane@acme.com",
+      "default_tax": "tax",
+      "default_terms": "Net 30"
+    }
+  ]
+}
