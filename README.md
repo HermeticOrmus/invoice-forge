@@ -1,5 +1,21 @@
-# Invoice Forge
+<p align="center">
+  <img src="https://ormus.solutions/mascot/chain_braces_to_swan.gif" alt="Invoice Forge" width="128" style="image-rendering: pixelated;" />
+</p>
 
+<h1 align="center">Invoice Forge</h1>
+
+<p align="center">
+  <em>Self-hosted invoice editor for freelancers. FastAPI + Playwright PDF export. JSON-backed, zero database.</em>
+</p>
+
+<p align="center">
+  <a href="https://github.com/HermeticOrmus/invoice-forge/stargazers"><img src="https://img.shields.io/github/stars/HermeticOrmus/invoice-forge?style=flat-square&color=aa8142" alt="Stars" /></a>
+  <a href="https://github.com/HermeticOrmus/invoice-forge/blob/main/LICENSE"><img src="https://img.shields.io/github/license/HermeticOrmus/invoice-forge?style=flat-square&color=aa8142" alt="License" /></a>
+  <a href="https://github.com/HermeticOrmus/invoice-forge/commits"><img src="https://img.shields.io/github/last-commit/HermeticOrmus/invoice-forge?style=flat-square&color=aa8142" alt="Last Commit" /></a>
+  <img src="https://img.shields.io/badge/Claude_Code-aa8142?style=flat-square&logo=anthropic&logoColor=white" alt="Claude Code" />
+</p>
+
+---
 Self-hosted invoice editor for freelancers. FastAPI backend, Playwright PDF export, JSON storage -- zero database required.
 
 ## Screenshot
