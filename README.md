@@ -16,6 +16,11 @@
 </p>
 
 ---
+
+Built under the [Gold Hat](https://github.com/HermeticOrmus/gold-hat-manifesto) principle: **empower or extract?** Always empower.
+
+Self-hosted systems: [ormus.solutions/systems](https://ormus.solutions/systems)
+
 Self-hosted invoice editor for freelancers. FastAPI backend, Playwright PDF export, JSON storage -- zero database required.
 
 ## Screenshot
