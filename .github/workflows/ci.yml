@@ -1,0 +1,45 @@
+# Hard kitchen gates (Lauren Tan / Michelin): ruff always; verify when landed.
+name: ci
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  ruff:
+    name: ruff
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install ruff
+        run: pip install "ruff>=0.2"
+      - name: Ruff check (pyproject select)
+        run: ruff check .
+
+  verify:
+    name: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Skip if verify script not on branch yet
+        id: gate
+        run: |
+          if [[ -f scripts/verify.sh ]]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "scripts/verify.sh missing — skip until FEATURE_MAP/verify lands (PR #1/#2)"
+          fi
+      - name: API smoke verify (PLAYWRIGHT_SKIP=1)
+        if: steps.gate.outputs.run == 'true'
+        run: PLAYWRIGHT_SKIP=1 bash scripts/verify.sh
