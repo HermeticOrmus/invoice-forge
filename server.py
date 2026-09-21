@@ -525,13 +525,41 @@ async def generate_pdf(doc_id: str):
     }
 
 
+def _resolve_under_output(raw: str) -> Path:
+    """Resolve raw and require the result to stay inside OUTPUT_DIR.
+
+    Relative paths are resolved against OUTPUT_DIR. Absolute paths are kept
+    only when they still land inside that root. resolve() follows symlinks,
+    so a link that points outside the root fails the same check.
+    """
+    if not isinstance(raw, str) or not raw.strip():
+        raise HTTPException(400, "Path must be a non-empty string inside the invoice output directory")
+    root = OUTPUT_DIR.resolve()
+    candidate = Path(raw)
+    resolved = candidate.resolve() if candidate.is_absolute() else (root / candidate).resolve()
+    try:
+        resolved.relative_to(root)
+    except ValueError:
+        raise HTTPException(400, "Path is outside the invoice output directory") from None
+    return resolved
+
+
 @app.post("/api/open-folder")
 async def open_folder(request: Request):
-    """Open a folder in the OS file explorer."""
+    """Open a folder in the OS file explorer.
+
+    Only paths that resolve inside OUTPUT_DIR are opened. Traversal, prefix
+    siblings, and absolute paths outside that root return 400.
+    """
     body = await request.json()
-    folder = Path(body.get("path", str(OUTPUT_DIR)))
+    if not isinstance(body, dict):
+        raise HTTPException(400, "Expected a JSON object")
+    raw = body.get("path", str(OUTPUT_DIR))
+    if raw is None:
+        raise HTTPException(400, "Path must be a non-empty string inside the invoice output directory")
+    folder = _resolve_under_output(raw)
     if not folder.exists():
-        folder = folder.parent
+        folder = _resolve_under_output(str(folder.parent))
     if not folder.exists():
         raise HTTPException(404, "Folder not found")
     import subprocess
