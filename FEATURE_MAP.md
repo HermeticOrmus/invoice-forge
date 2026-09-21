@@ -62,6 +62,7 @@ Agent-facing map for Lauren Tan / poteto-mode. Prefer these selectors and routes
 | PUT | `/api/invoices/{id}` | Save |
 | POST | `/api/invoices` | Create |
 | POST | `/api/invoices/{id}/pdf` | PDF |
+| POST | `/api/open-folder` | Open a path under `output_dir` only. Traversal, symlinks, and absolute paths that resolve outside that root return 400 |
 | GET | `/api/clients` | List clients |
 | PUT | `/api/clients` | Save clients |
 
