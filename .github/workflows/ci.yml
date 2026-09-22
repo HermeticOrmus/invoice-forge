@@ -23,6 +23,14 @@ jobs:
       - name: Ruff check (pyproject select)
         run: ruff check .
 
+  workaround-comments:
+    name: workaround-comments
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Workaround-comment fence
+        run: bash scripts/check-workaround-comments.sh
+
   verify:
     name: verify
     runs-on: ubuntu-latest
