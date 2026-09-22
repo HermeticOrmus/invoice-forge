@@ -28,6 +28,21 @@ We use conventional commits:
 - JavaScript: Vanilla JS, no frameworks, no build step
 - CSS: CSS custom properties for theming, no preprocessors
 
+## Workaround comments
+
+Gardeners for HermeticOrmus and this repo are named in `GARDENER.md`. Read that before copying a pattern you are unsure about.
+
+Do not leave or copy comments that justify a bad pattern. Use the selectors and routes in `FEATURE_MAP.md`. Delete the footgun instead of describing it.
+
+These markers are banned in `.py`, `.js`, and `.ts` (comments and strings alike; match is case-insensitive). `scripts/check-workaround-comments.sh` fails when it finds one, and `scripts/verify.sh` runs that check:
+
+- `workaround`
+- `HACK:`
+- `temporary hack`
+- `try to find the button`
+
+Do not weaken the list to land a change.
+
 ## Philosophy
 
 This project follows the Gold Hat philosophy:

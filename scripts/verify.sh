@@ -12,8 +12,10 @@ fail() { echo "VERIFY FAIL: $*" >&2; exit 1; }
 ok() { echo "VERIFY OK: $*"; }
 
 test -f FEATURE_MAP.md || fail "FEATURE_MAP.md missing"
+test -f GARDENER.md || fail "GARDENER.md missing"
 test -f server.py || fail "server.py missing"
 test -f config.json.example || fail "config.json.example missing"
+bash "$ROOT/scripts/check-workaround-comments.sh"
 
 if [[ ! -d .venv ]]; then
   python3 -m venv .venv
